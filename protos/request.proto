@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package wproject;
+
+message Request {
+  string phrase = 1;
+  int64 id = 2; 
+ }
+

@@ -1,0 +1,10 @@
+[requires]
+boost_asio/1.66.0@bincrafters/stable
+mysql-connector-c/6.1.11@bincrafters/stable
+
+[generators]
+cmake
+
+[imports]
+lib, *.dylib* -> ./
+bin, *.dll* -> ./

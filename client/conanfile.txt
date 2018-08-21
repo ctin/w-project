@@ -1,0 +1,10 @@
+[requires]
+boost_asio/1.66.0@bincrafters/stable
+boost_thread/1.66.0@bincrafters/stable
+
+[generators]
+cmake
+
+[imports]
+lib, *.dylib* -> ./
+bin, *.dll* -> ./
