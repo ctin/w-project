@@ -22,7 +22,7 @@ ECHO
 
 cd $BUILD_DIR
 echo "$BASE_DIR"
-conan install $BASE_DIR
+conan install $BASE_DIR --build missing
 cmake $BASE_DIR
 make
 #cmake -G Xcode $BASE_DIR
