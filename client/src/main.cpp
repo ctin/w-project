@@ -24,24 +24,26 @@ enum { max_length = 1024 };
 
 int main(int argc, char* argv[])
 {
-    try
+    if (argc != 4)
     {
-        if (argc != 4)
-        {
-            std::cerr << "Usage: blocking_tcp_echo_client <host> <port> <id>\n";
-            return 1;
-        }
+        std::cerr << "Usage: wclient <host> <port> <id>\n";
+        return 1;
+    }
+    while(true)
+    {
+
 
         boost::asio::io_context io_context;
 
         tcp::socket s(io_context);
         tcp::resolver resolver(io_context);
-        boost::asio::connect(s, resolver.resolve(argv[1], argv[2]));
-        
+
         int id = atoi(argv[3]);
         int count = 0;
-        while(true)
+
+        try 
         {
+            boost::asio::connect(s, resolver.resolve(argv[1], argv[2]));
             {
                 //prepare packet
                 wproject::Request request;
@@ -75,10 +77,11 @@ int main(int argc, char* argv[])
             }
             boost::this_thread::sleep_for(boost::chrono::milliseconds(1000));
         }
-    }
-    catch (std::exception& e)
-    {
-        std::cerr << "Exception: " << e.what() << "\n";
+        catch(const std::exception& e) 
+        {
+            std::cerr << "got exception: " << e.what() << std::endl;
+            boost::this_thread::sleep_for(boost::chrono::milliseconds(1000));
+        }
     }
 
     return 0;
