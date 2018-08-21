@@ -33,12 +33,13 @@ public:
     }
     
     ~session() {
-        DB::close();
+        DB::close(context);
     }
     
     void start()
     {
-        DB::connect("localhost", "ctin", "ctin", "ctin");
+        context = DB::create();
+        DB::connect(context, "localhost", "ctin", "ctin", "ctin");
         do_read();
     }
     
@@ -55,11 +56,11 @@ private:
                                         wproject::Request request;
                                         request.ParseFromArray(data_, length);
                                         
-                                        DB::write(request.id(), request.phrase().data());
+                                        bool writeOK = DB::write(context, request.id(), request.phrase().data());
                                         
                                         wproject::Response response;
-                                        response.set_type(::wproject::Response::SUCCESS);
-                                        response.set_text("success");
+                                        response.set_type(writeOK ? ::wproject::Response::SUCCESS : ::wproject::Response::ERROR);
+                                        response.set_text(writeOK ? "success" : "error");
                                         do_write(response);
                                     }
                                 });
@@ -88,6 +89,7 @@ private:
     tcp::socket socket_;
     enum { max_length = 1024 };
     char data_[max_length];
+    DB::Context* context = nullptr;
 };
 
 class server

@@ -7,7 +7,6 @@ def run(id):
     scriptPath = os.path.realpath(__file__)
     scriptDir = os.path.dirname(scriptPath)
     clientPath = os.path.join(scriptDir, "build/bin/wclient")
-    print(clientPath)
     subprocess.call([clientPath, "127.0.0.1", "8080", str(id)])
 
 if __name__ == '__main__':

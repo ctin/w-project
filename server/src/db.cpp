@@ -5,13 +5,16 @@
 
 #include <sstream>
 
-namespace
-{
-    MYSQL *con = nullptr;
-}
-
 namespace DB
 {
+
+struct Context {
+    MYSQL *con = nullptr;
+};
+
+Context* create() {
+    return new Context();
+}
 
 void finish_with_error(MYSQL *con)
 {
@@ -20,24 +23,26 @@ void finish_with_error(MYSQL *con)
     exit(1);
 }
 
-void connect(const char * address, const char * login, const char * password, const char * dbname) {
+bool connect(Context* context, const char * address, const char * login, const char * password, const char * dbname) {
     
-    con = mysql_init(NULL);
+    context->con = mysql_init(NULL);
     
-    if (con == NULL)
+    if (context->con == NULL)
     {
-        fprintf(stderr, "%s\n", mysql_error(con));
+        fprintf(stderr, "%s\n", mysql_error(context->con));
         exit(1);
     }
     
-    if (mysql_real_connect(con, address, login, password,
+    if (mysql_real_connect(context->con, address, login, password,
                            dbname, 0, "/Applications/MAMP/tmp/mysql/mysql.sock", 0) == NULL)
     {
-        finish_with_error(con);
+        finish_with_error(context->con);
+        return false;
     }
+    return true;
 }
 
-void write(int id, const char* phrase) {
+bool write(Context* context, int id, const char* phrase) {
     std::stringstream ss;
     ss << "INSERT INTO ctin VALUES("
         << id
@@ -45,13 +50,16 @@ void write(int id, const char* phrase) {
         << ", " << time(0)
         << ")";
     const char* data = ss.str().data();
-    if(mysql_query(con, data)) {
-        finish_with_error(con);
+    if(mysql_query(context->con, data)) {
+        finish_with_error(context->con);
+        return false;
     }
+    return true;
 }
 
-void close() {
-    mysql_close(con);
+void close(Context* context) {
+    mysql_close(context->con);
+    delete context;
 }
 
 }
