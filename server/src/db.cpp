@@ -4,6 +4,8 @@
 #include <mysql.h>
 
 #include <sstream>
+#include <chrono>
+#include <ratio>
 
 namespace DB
 {
@@ -43,11 +45,14 @@ bool connect(Context* context, const char * address, const char * login, const c
 }
 
 bool write(Context* context, int id, const char* phrase) {
+
+    long long timepoint = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+
     std::stringstream ss;
     ss << "INSERT INTO ctin VALUES("
         << id
         << ", " << "'" << phrase << "'"
-        << ", " << time(0)
+        << ", " << timepoint
         << ")";
     const char* data = ss.str().data();
     if(mysql_query(context->con, data)) {
